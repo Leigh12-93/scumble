@@ -876,6 +876,7 @@ function buildMenu() {
                 { label: "Inpaint Canvas node on GitHub", click: () => shell.openExternal("https://github.com/DenRakEiw/ComfyUI-InpaintCanvas") },
                 { type: "separator" },
                 { label: "Copy MCP registration (Claude Code)", click: () => copyMcpRegistration("code") },
+                { label: "Copy MCP registration (Codex CLI)", click: () => copyMcpRegistration("codex") },
                 { label: "Copy MCP registration (Claude Desktop JSON)", click: () => copyMcpRegistration("desktop") },
                 { type: "separator" },
                 // the Store copy is updated by the Store (electron/main/msix.js)
