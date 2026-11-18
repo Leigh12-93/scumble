@@ -34,7 +34,7 @@ function server(where) {
     return { command: where.exe, args: [where.launcher, "--mcp"], env: { ELECTRON_RUN_AS_NODE: "1" } };
 }
 
-/** The text for the clipboard: "desktop" is Claude Desktop's JSON, anything else a `claude mcp add` line. */
+/** Registration for Claude Desktop, Claude Code and Codex CLI. No OAuth tokens are read or stored. */
 function registration(kind, where) {
     const s = server(where);
     if (kind === "desktop") {
@@ -42,12 +42,13 @@ function registration(kind, where) {
         if (Object.keys(s.env).length) entry.env = s.env;
         return JSON.stringify({ mcpServers: { scumble: entry } }, null, 2);
     }
-    const env = Object.entries(s.env).map(([k, v]) => `-e ${k}=${v} `).join("");
+    const codex = kind === "codex";
+    const env = Object.entries(s.env).map(([k, v]) => `${codex ? "--env" : "-e"} ${k}=${v} `).join("");
     // every argument quoted but a last one that is a plain switch (--mcp), as the line has always read
     const last = s.args[s.args.length - 1];
     const bare = /^--[a-z-]+$/.test(last);
     const quoted = [s.command, ...(bare ? s.args.slice(0, -1) : s.args)].map((a) => `"${a}"`).join(" ");
-    return `claude mcp add scumble ${env}-- ${quoted}${bare ? " " + last : ""}`;
+    return `${codex ? "codex" : "claude"} mcp add scumble ${env}-- ${quoted}${bare ? " " + last : ""}`;
 }
 
 module.exports = { server, registration, STORE_LAUNCH };
