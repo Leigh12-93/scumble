@@ -179,7 +179,7 @@ server/index.js --where` inside the unpacked bundle prints what it found. The bu
 For every other client, and for Claude Desktop by hand: register the **launcher**, not the executable directly: `electron/main/mcp/launch.js` is a
 plain Node script that the same executable runs in Node mode (`ELECTRON_RUN_AS_NODE=1`),
 spawns the real app as its child and hands the client a stdout that starts with the first
-JSON message. Help > Copy MCP registration puts the two lines below on the clipboard with
+JSON message. Help > Copy MCP registration has separate Claude Code, Codex CLI and Claude Desktop entries, each with
 the paths of the installation you are running.
 
 Claude Code, packaged app:
@@ -212,6 +212,7 @@ codex mcp list
 Sign in to the official Codex CLI with `codex login` first. This connects Codex
 to Scumble's **editing tools via MCP**, not to Scumble's built-in API-key Assistant.
 The launcher never reads or handles the CLI's authentication tokens.
+
 Claude Desktop (`claude_desktop_config.json`):
 
 ```json
