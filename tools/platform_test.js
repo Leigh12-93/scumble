@@ -83,6 +83,23 @@ check("codex_registration_store_uses_stable_execution_alias", () => {
     eq(registration("codex", STORE), 'codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "' + ALIAS + '" "-e" "' + STORE_LAUNCH + '"');
 });
 
+check("codex_copy_is_literal_with_powershell_metacharacters", () => {
+    const tricky = { ...WIN, exe: "C:\\Users\\$HOME\\Scumble.exe" };
+    const line = registration("codex", tricky);
+    if (!line.includes("'C:\\Users\\$HOME\\Scumble.exe'")) throw new Error("PowerShell would expand the path");
+});
+
+check("posix_copy_is_literal_with_shell_metacharacters", () => {
+    const tricky = { ...DEB, exe: "/home/$HOME/scumble" };
+    if (!registration("codex", tricky).includes("'/home/$HOME/scumble'")) throw new Error("POSIX shell would expand the path");
+});
+
+check("mcp_copy_rejects_multiline_arguments", () => {
+    let refused = false;
+    try { registration("codex", { ...WIN, exe: "C:\\unsafe\ncommand.exe" }); } catch (_) { refused = true; }
+    if (!refused) throw new Error("multiline launcher argument was accepted");
+});
+
 check("the_store_alias_is_read_on_windows_only", () => {
     eq(server({ ...DEB, storeAlias: ALIAS }), server(DEB), "linux");
     eq(server({ ...WIN, storeAlias: "" }), server(WIN), "empty");
