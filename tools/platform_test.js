@@ -67,6 +67,22 @@ check("the_store_copy_is_registered_by_its_alias_and_nothing_of_its_version_fold
     if (/["\\$`]/.test(STORE_LAUNCH)) throw new Error("the launch code needs quoting: " + STORE_LAUNCH);
 });
 
+
+check("codex_registration_uses_installed_windows_paths", () => {
+    const line = registration("codex", WIN);
+    eq(line, "codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- " + [WIN.exe, WIN.launcher].map((p) => '"' + p + '"').join(" ") + " --mcp", "codex windows");
+    const unicode = { ...WIN, exe: "C:\\Users\\André\\Photo Lab\\Scumble.exe" };
+    if (!registration("codex", unicode).includes('"' + unicode.exe + '"')) throw new Error("Unicode/space path was not quoted");
+});
+
+check("codex_registration_appimage_does_not_leak_mount_path", () => {
+    eq(registration("codex", APPIMAGE), 'codex mcp add scumble -- "' + APPIMAGE.appImage + '" --mcp');
+});
+
+check("codex_registration_store_uses_stable_execution_alias", () => {
+    eq(registration("codex", STORE), 'codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "' + ALIAS + '" "-e" "' + STORE_LAUNCH + '"');
+});
+
 check("the_store_alias_is_read_on_windows_only", () => {
     eq(server({ ...DEB, storeAlias: ALIAS }), server(DEB), "linux");
     eq(server({ ...WIN, storeAlias: "" }), server(WIN), "empty");
