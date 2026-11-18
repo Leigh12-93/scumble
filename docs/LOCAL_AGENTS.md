@@ -8,7 +8,7 @@ Scumble exposes its existing editor tools through a local **stdio MCP server**. 
 
 1. Install Scumble on the MSI and open it. Install Claude Code and Codex CLI according to their official instructions.
 2. In PowerShell run `claude auth status` and `codex login status`. If either is not signed in, use that CLI's own `claude auth login` or `codex login` flow. Never paste tokens into Scumble.
-3. In Scumble choose **Help > Copy MCP registration** to retrieve the **installation-specific** launcher path. The Windows Electron launcher matters: running the executable directly can add CR/LF to stdout and break MCP stdio.
+3. In Scumble choose **Help > Copy MCP registration (Claude Code)** or **Help > Copy MCP registration (Codex CLI)** to copy the installation-specific command. The Windows Electron launcher matters: running the executable directly can add CR/LF to stdout and break MCP stdio.
 
 ## Claude Code
 
@@ -16,7 +16,7 @@ Paste Scumble's existing generated `claude mcp add scumble -e ELECTRON_RUN_AS_NO
 
 ## Codex CLI
 
-Use the same executable and launcher from Scumble's registration, but register them with Codex:
+Use **Help > Copy MCP registration (Codex CLI)** and paste that command into PowerShell. The example below is for troubleshooting only:
 
 ```powershell
 codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "C:\\path\\to\\Scumble.exe" "C:\\path\\to\\resources\\app.asar\\electron\\main\\mcp\\launch.js" --mcp
@@ -34,4 +34,4 @@ The `registration("codex", where)` helper now produces this command from the **a
 - If MCP starts but tools cannot see the editor, launch the same Scumble installation and check the local bridge/attach mode. Check the correct executable and launcher paths; an out-of-date Store package path will fail.
 - To disconnect run `claude mcp remove scumble` or `codex mcp remove scumble`. This deletes MCP registration, not CLI login credentials.
 
-Test the generated commands with `node tools/agent_registration_test.js`.
+Test the generated commands with `node tools/platform_test.js`, which also covers Windows Store and Linux package layouts.
