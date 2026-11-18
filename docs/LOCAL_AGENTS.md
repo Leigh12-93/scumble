@@ -19,12 +19,12 @@ Paste Scumble's existing generated `claude mcp add scumble -e ELECTRON_RUN_AS_NO
 Use **Help > Copy MCP registration (Codex CLI)** and paste that command into PowerShell. The example below is for troubleshooting only:
 
 ```powershell
-codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "C:\path\to\Scumble.exe" "C:\path\to\resources\\app.asar\\electron\\main\\mcp\\launch.js" --mcp
+codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "C:\path\to\Scumble.exe" "C:\path\to\resources\app.asar\electron\main\mcp\launch.js" --mcp
 codex mcp get scumble --json
 codex mcp list
 ```
 
-The `registration("codex", where)` helper now produces this command from the **actual** installation paths, including the Store alias / Linux AppImage cases. Do not copy the `C:\\path\\to` placeholder verbatim. The Codex CLI or IDE can then call Scumble's `list_documents`, `screenshot`, masks, layers and other tools.
+The `registration("codex", where)` helper now produces this command from the **actual** installation paths, including the Store alias / Linux AppImage cases. Do not copy the `C:\path\to` placeholder verbatim. The Codex CLI or IDE can then call Scumble's `list_documents`, `screenshot`, masks, layers and other tools.
 
 ## Security and troubleshooting
 
