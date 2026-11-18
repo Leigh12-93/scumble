@@ -4,7 +4,7 @@
 
 ## The supported architecture
 
-\`\`\`text
+```text
 User signs in through each vendor's unmodified, official CLI
         |                               |
    Claude Code                      Codex CLI
@@ -14,11 +14,11 @@ User signs in through each vendor's unmodified, official CLI
           Scumble's existing MCP server
                         |
              Visible photo editor
-\`\`\`
+```
 
-Scumble already exposes its editing commands and screenshots through \`electron/main/mcp/server.js\` and \`electron/main/mcp/launch.js\`. PR #1 gives both CLIs an installation-specific registration via the Help menu. The CLIs own sign-in, token renewal, model selection and account limits. Scumble does not receive authentication secrets.
+Scumble already exposes its editing commands and screenshots through `electron/main/mcp/server.js` and `electron/main/mcp/launch.js`. PR #1 gives both CLIs an installation-specific registration via the Help menu. The CLIs own sign-in, token renewal, model selection and account limits. Scumble does not receive authentication secrets.
 
-The in-app Assistant currently uses independently billed API-key integrations via \`electron/main/assistant/index.js\`, \`providers.js\`, \`anthropic.js\`, and \`responses.js\`. Do not pretend CLI subscription sessions are API keys or send their credentials to provider HTTP endpoints.
+The in-app Assistant currently uses independently billed API-key integrations via `electron/main/assistant/index.js`, `providers.js`, `anthropic.js`, and `responses.js`. Do not pretend CLI subscription sessions are API keys or send their credentials to provider HTTP endpoints.
 
 ## Provider boundary: a release gate, not an implementation detail
 
@@ -30,27 +30,27 @@ OpenAI supports signing in to the **official Codex CLI** with ChatGPT, as descri
 
 ## What this PR actually adds
 
-\`node tools/local_agent_preflight.js\` checks whether \`claude\` and \`codex\` are installed and whether the official CLI reports a valid sign-in. \`--json\` prints just the bounded status fields. It never reads credential files or prints CLI's raw stdout/stderr, so emails, paths, access tokens and refresh tokens are excluded. \`node tools/local_agent_preflight_test.js\` exercises signed-in, signed-out, absent and sensitive-output fixtures without accessing an account.
+`node tools/local_agent_preflight.js` checks whether `claude` and `codex` are installed and whether the official CLI reports a valid sign-in. `--json` prints just the bounded status fields. It never reads credential files or prints CLI's raw stdout/stderr, so emails, paths, access tokens and refresh tokens are excluded. `node tools/local_agent_preflight_test.js` exercises signed-in, signed-out, absent and sensitive-output fixtures without accessing an account.
 
-The \`method\` field is a CLI-reported or parsed indicator, **not** evidence of a particular plan, billing entitlement, API compatibility or permission to embed that login in another application.
+The `method` field is a CLI-reported or parsed indicator, **not** evidence of a particular plan, billing entitlement, API compatibility or permission to embed that login in another application.
 
 ## MSI setup and verification
 
 1. Open Scumble and make sure its editor is responsive. Install the official [Claude Code](https://code.claude.com/docs/en/overview) and [Codex CLI](https://learn.chatgpt.com/docs/cli/reference) binaries.
-2. Run \`claude auth login\` and \`codex login\` in PowerShell if you are not already signed in. Complete login in the vendors' own flows; do not paste tokens into Scumble.
-3. Run \`node tools/local_agent_preflight.js\` from a checkout of this repo to see whether each local CLI is available and signed in. This does not prove MCP is working.
+2. Run `claude auth login` and `codex login` in PowerShell if you are not already signed in. Complete login in the vendors' own flows; do not paste tokens into Scumble.
+3. Run `node tools/local_agent_preflight.js` from a checkout of this repo to see whether each local CLI is available and signed in. This does not prove MCP is working.
 4. After PR #1 is merged/built, copy the CLI-specific registration from Scumble's **Help** menu and paste it into PowerShell. Registration is a user action and should not silently alter Claude's or Codex's settings.
-5. Run \`claude mcp list\` and \`codex mcp list\`; then open each CLI, inspect its \`scumble\` server and request \`list_documents\` and \`screenshot\` before attempting edits.
+5. Run `claude mcp list` and `codex mcp list`; then open each CLI, inspect its `scumble` server and request `list_documents` and `screenshot` before attempting edits.
 6. Make a small reversible layer edit, inspect the actual image and undo manually. Test a destructive operation **with explicit approval** and an expensive generation **with explicit cost confirmation**, then verify exporting only to a user-supplied path. Keep backups of important documents.
 
 ## Security constraints
 
-- **External agents are not the in-app assistant.** The built-in assistant's approval cards, "Undo this turn", pinned-document handling and cost checks are **not** automatically inherited by an external MCP client (see \`docs/ASSISTANT.md\`). The MCP server executes commands. Agents should ask first, but text instructions alone do not enforce safety.
+- **External agents are not the in-app assistant.** The built-in assistant's approval cards, "Undo this turn", pinned-document handling and cost checks are **not** automatically inherited by an external MCP client (see `docs/ASSISTANT.md`). The MCP server executes commands. Agents should ask first, but text instructions alone do not enforce safety.
 - Do not run unrestricted shell agents or skip approvals. An agent can modify an open image and may have other local capabilities outside Scumble's MCP server.
-- No reading \`~/.codex/auth.json\`, \`~/.claude\` auth files, browser cookies, private keys or process tokens. No OAuth proxy, credential forwarding, refresh-token extraction, or custom login-screen impersonation.
+- No reading `~/.codex/auth.json`, `~/.claude` auth files, browser cookies, private keys or process tokens. No OAuth proxy, credential forwarding, refresh-token extraction, or custom login-screen impersonation.
 - No arbitrary remote MCP listener. Use local stdio. Do not put images, raw CLI output, or credentials into GitHub artifacts/logs.
 - Use **one editing agent at a time** per Scumble document until cross-agent mutation locking and document ownership are explicitly designed. An MCP command can otherwise race with user edits or another agent.
-- Restart and verify the correct MSI/installed instance before testing a second agent. The launcher handles Electron's Windows stdout issue; raw \`Scumble.exe --mcp\` may corrupt stdio.
+- Restart and verify the correct MSI/installed instance before testing a second agent. The launcher handles Electron's Windows stdout issue; raw `Scumble.exe --mcp` may corrupt stdio.
 - A downloaded/untrusted photo, layer label or prompt can contain hostile instructions. Treat it as content, not as permission to read other files or contact a remote URL.
 
 ## Optional future native assistant integration
