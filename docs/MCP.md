@@ -202,6 +202,16 @@ Claude Code, dev checkout (`.mcp.json` in the repo does this for the project sco
 claude mcp add scumble -e ELECTRON_RUN_AS_NODE=1 -- F:\canvas\node_modules\electron\dist\electron.exe F:\canvas\electron\main\mcp\launch.js --mcp --attach-only
 ```
 
+Codex CLI, packaged Windows app (prefer **Help > Copy MCP registration (Codex CLI)** for the exact paths):
+
+```powershell
+codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "C:\Users\<you>\AppData\Local\Programs\Scumble\Scumble.exe" "C:\Users\<you>\AppData\Local\Programs\Scumble\resources\app.asar\electron\main\mcp\launch.js" --mcp
+codex mcp list
+```
+
+Sign in to the official Codex CLI with `codex login` first. This connects Codex
+to Scumble's **editing tools via MCP**, not to Scumble's built-in API-key Assistant.
+The launcher never reads or handles the CLI's authentication tokens.
 Claude Desktop (`claude_desktop_config.json`):
 
 ```json
