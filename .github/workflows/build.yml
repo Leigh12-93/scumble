@@ -86,6 +86,10 @@ jobs:
         shell: bash
         run: npx eslint .
 
+      - name: MCP registration regression
+        shell: bash
+        run: node tools/platform_test.js
+
       # the three contracts (the editor host, the command descriptors, the recipe shape) against
       # their typedefs; nothing is compiled, tsconfig.check.json says what is checked and why
       - name: Types

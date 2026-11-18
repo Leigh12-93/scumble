@@ -34,7 +34,20 @@ function server(where) {
     return { command: where.exe, args: [where.launcher, "--mcp"], env: { ELECTRON_RUN_AS_NODE: "1" } };
 }
 
-/** The text for the clipboard: "desktop" is Claude Desktop's JSON, anything else a `claude mcp add` line. */
+
+/** Quote a pasted command for PowerShell (Windows) or POSIX shells. */
+function quoteArg(value, platform) {
+    const raw = String(value);
+    if (/[\r\n\0]/.test(raw)) throw new Error("invalid MCP launcher path: newline or NUL");
+    const tick = String.fromCharCode(96);
+    const literal = raw.includes("$") || raw.includes(tick) || raw.includes('"') || (platform !== "win32" && raw.includes("\\"));
+    if (platform === "win32") {
+        return literal ? "'" + raw.replace(/'/g, "''") + "'" : '"' + raw + '"';
+    }
+    return literal ? "'" + raw.replace(/'/g, "'\\''") + "'" : '"' + raw + '"';
+}
+
+/** Generate the clipboard registration for Claude Desktop, Claude Code, or Codex CLI. */
 function registration(kind, where) {
     const s = server(where);
     if (kind === "desktop") {
@@ -42,12 +55,13 @@ function registration(kind, where) {
         if (Object.keys(s.env).length) entry.env = s.env;
         return JSON.stringify({ mcpServers: { scumble: entry } }, null, 2);
     }
-    const env = Object.entries(s.env).map(([k, v]) => `-e ${k}=${v} `).join("");
+    const codex = kind === "codex";
+    const env = Object.entries(s.env).map(([k, v]) => `${codex ? "--env" : "-e"} ${k}=${v} `).join("");
     // every argument quoted but a last one that is a plain switch (--mcp), as the line has always read
     const last = s.args[s.args.length - 1];
     const bare = /^--[a-z-]+$/.test(last);
-    const quoted = [s.command, ...(bare ? s.args.slice(0, -1) : s.args)].map((a) => `"${a}"`).join(" ");
-    return `claude mcp add scumble ${env}-- ${quoted}${bare ? " " + last : ""}`;
+    const quoted = [s.command, ...(bare ? s.args.slice(0, -1) : s.args)].map((a) => quoteArg(a, where.platform)).join(" ");
+    return `${codex ? "codex" : "claude"} mcp add scumble ${env}-- ${quoted}${bare ? " " + last : ""}`;
 }
 
 module.exports = { server, registration, STORE_LAUNCH };
