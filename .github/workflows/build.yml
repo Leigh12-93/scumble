@@ -80,6 +80,10 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Local CLI preflight tests
+        shell: bash
+        run: node tools/local_agent_preflight_test.js
+
       # a name that does not exist, a write to an imported binding or to a const: things that
       # parse fine and throw at run time (eslint.config.mjs says what is checked and why)
       - name: Lint
