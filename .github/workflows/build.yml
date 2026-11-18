@@ -86,6 +86,10 @@ jobs:
         shell: bash
         run: npx eslint .
 
+      - name: Local CLI preflight tests
+        shell: bash
+        run: node tools/local_agent_preflight_test.js
+
       # the three contracts (the editor host, the command descriptors, the recipe shape) against
       # their typedefs; nothing is compiled, tsconfig.check.json says what is checked and why
       - name: Types
