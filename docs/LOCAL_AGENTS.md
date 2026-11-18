@@ -19,7 +19,7 @@ Paste Scumble's existing generated `claude mcp add scumble -e ELECTRON_RUN_AS_NO
 Use **Help > Copy MCP registration (Codex CLI)** and paste that command into PowerShell. The example below is for troubleshooting only:
 
 ```powershell
-codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "C:\\path\\to\\Scumble.exe" "C:\\path\\to\\resources\\app.asar\\electron\\main\\mcp\\launch.js" --mcp
+codex mcp add scumble --env ELECTRON_RUN_AS_NODE=1 -- "C:\path\to\Scumble.exe" "C:\path\to\resources\\app.asar\\electron\\main\\mcp\\launch.js" --mcp
 codex mcp get scumble --json
 codex mcp list
 ```
@@ -29,7 +29,7 @@ The `registration("codex", where)` helper now produces this command from the **a
 ## Security and troubleshooting
 
 - Keep the MCP server **local stdio only**, not a remotely exposed HTTP endpoint.
-- Both CLIs may receive screenshots, documents and layer metadata when you give them editor-tool access. Approve destructive edits, exports and expensive generation explicitly in the agent session.
+- Both CLIs may receive screenshots, documents and layer metadata when you grant access. **External MCP tool calls execute immediately**, without Scumble's built-in Assistant approval cards or its "Undo this turn" snapshot. Require agent-side confirmation for destructive edits, exports and expensive generation; back up important images before use.
 - Claude Code and Codex may have their own model/usage limits and permissions. This integration does not bypass them or make the in-app Assistant use a subscription.
 - If MCP starts but tools cannot see the editor, launch the same Scumble installation and check the local bridge/attach mode. Check the correct executable and launcher paths; an out-of-date Store package path will fail.
 - To disconnect run `claude mcp remove scumble` or `codex mcp remove scumble`. This deletes MCP registration, not CLI login credentials.
